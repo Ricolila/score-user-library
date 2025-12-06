@@ -5,55 +5,77 @@ import QtQuick3D.Helpers
 import QtQuick3D.AssetUtils
 
 Score.Script {
-  Score.LineEdit {
+  Score.FileChooser {
     objectName: "glTF file"
     id: model_url
   }
-  Score.LineEdit {
+  Score.FileChooser {
     objectName: "Environment map"
     id: env_url
+  }
+  Score.XYZSpinBoxes {
+    id: lightPosition
+    objectName: "Light Position"
+    min: Qt.vector3d(-1000.0, -1000.0, -1000.0)
+    max: Qt.vector3d(1000.0, 1000.0, 1000.0)
+  }
+  Score.HSVSlider {
+    id: lightColor
+    objectName: "Light Color"
   }
 
   Score.TextureOutlet {
     objectName: "out"
-    item:
-
-    View3D {
+    item: View3D {
       anchors.fill: parent
 
       environment: SceneEnvironment {
-        clearColor: "green"
+        clearColor: "black"
 
         antialiasingMode: SceneEnvironment.MSAA
         tonemapMode: SceneEnvironment.TonemapModeFilmic
         backgroundMode: SceneEnvironment.SkyBox
         lightProbe: Texture {
-          source: env_url.value
+          source: env_url.value;
         }
       }
 
       PerspectiveCamera {
         id: camera
-        y: 100
+        y: 5
+        clipNear: 0.01
+        clipFar: 1000
+      }
+
+      PointLight {
+          id: pointLight
+          x: lightPosition.value.x
+          y: lightPosition.value.y
+          z: lightPosition.value.z
+          color: lightColor.value
+          brightness: 25
+          castsShadow: true
+          shadowFactor: 75
       }
 
       DirectionalLight {
+        castsShadow: true
       }
+
       RuntimeLoader {
         id: importNode
         scale: Qt.vector3d(100, 100, 100)
-        source: model_url.value
+        source: model_url.value;
       }
 
       WasdController {
+        id: wasd
         controlledObject: camera
       }
     }
   }
 
-
   tick: function(token, state) {
-    rect.x = ((rect.x + 1) % 100)
-    rect.y = ((rect.y + 1) % 100)
+      wasd.forceActiveFocus();
   }
 }
