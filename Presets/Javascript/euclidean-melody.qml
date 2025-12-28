@@ -1,5 +1,5 @@
 import Score 1.0
-import 'total-serialism.js' as Serialism
+import TotalSerialism.Serialism as Serialism
 
 Script { 
   Impulse { objectName: "Recompute"; onImpulse: recompute(); }
